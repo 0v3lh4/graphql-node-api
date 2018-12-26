@@ -1,0 +1,35 @@
+{
+  "name": "graphql-node-api",
+  "version": "1.0.0",
+  "description": "Curso de graphql",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development nodemon --watch dist --delay 5 ./dist/index",
+    "gulp": "gulp"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/express": "^4.16.0",
+    "@types/express-graphql": "^0.6.2",
+    "@types/graphql": "^14.0.3",
+    "@types/node": "^10.12.18",
+    "@types/sequelize": "^4.27.33",
+    "cross-env": "^5.2.0",
+    "gulp": "^4.0.0",
+    "gulp-clean": "^0.4.0",
+    "gulp-typescript": "^5.0.0",
+    "nodemon": "^1.18.9",
+    "sequelize-cli": "^5.4.0",
+    "tslint": "^5.12.0",
+    "typescript": "^3.2.2"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.16.4",
+    "express-graphql": "^0.7.1",
+    "graphql": "^14.0.2",
+    "graphql-tools": "^4.0.3",
+    "mysql2": "^1.6.4",
+    "sequelize": "^4.42.0"
+  }
+}

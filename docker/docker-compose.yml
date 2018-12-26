@@ -1,0 +1,20 @@
+version: '3.3'
+volumes:
+  graphql_data:
+services:
+  db_graphql:
+    image: mariadb:latest
+    ports:
+      - 3306:3306
+    volumes:
+      - graphql_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=anitnelav
+      - MYSQL_DATABASE=app_development
+    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+  app_graphql:
+    image: adminer:latest
+    links:
+      - db_graphql
+    ports:
+      - 8080:8080
