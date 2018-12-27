@@ -1,13 +1,11 @@
 version: '3.3'
-volumes:
-  graphql_data:
 services:
   db_graphql:
     image: mariadb:latest
     ports:
       - 3306:3306
     volumes:
-      - graphql_data:/var/lib/mysql
+      - /Users/hendrikaraujo/Projects/graphql-node-api/docker/data:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=anitnelav
       - MYSQL_DATABASE=app_development

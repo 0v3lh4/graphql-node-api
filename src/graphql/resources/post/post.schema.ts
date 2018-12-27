@@ -7,7 +7,7 @@ const postTypes: string = `
         createdAt: String!
         updatedAt: String!
         author: User!
-        comments: [ Comment! ]!
+        comments(limit: Int, offset: Int): [ Comment! ]!
     }
 
     input PostCreateInput {

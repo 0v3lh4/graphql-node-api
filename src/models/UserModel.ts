@@ -55,6 +55,11 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
             hooks: {
                 beforeCreate: (user: UserInstance, options: Sequelize.CreateOptions): void => {
                     user.password = hashSync(user.password as string, genSaltSync());
+                },
+                beforeUpdate: (user: UserInstance, options: Sequelize.CreateOptions): void => {
+                    if (user.changed('password')) {
+                        user.password = hashSync(user.password as string, genSaltSync());
+                    }
                 }
             }
         });
