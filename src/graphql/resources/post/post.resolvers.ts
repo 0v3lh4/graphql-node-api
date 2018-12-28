@@ -4,6 +4,7 @@ import { UserInstance } from "../../../models/UserModel";
 import { error } from "util";
 import { PostInstance } from "../../../models/PostModel";
 import { Transaction } from "sequelize";
+import { handleError } from "../../../utils/utils";
 
 export const postResolvers = {
     Post: {
@@ -13,7 +14,8 @@ export const postResolvers = {
                 .then((user: UserInstance | null) => {
                     if (!user) throw new error(`Author with id ${post.get('author')} not found`);
                     return user;
-                });
+                })
+                .catch(handleError);
         },
 
         comments: (post, { limit = 10, offset = 0 }, { db }: { db: DbConnection }, info: GraphQLResolveInfo) => {
@@ -22,7 +24,8 @@ export const postResolvers = {
                     where: { post: post.get('id') },
                     limit,
                     offset
-                });
+                })
+                .catch(handleError);
         }
     },
 
@@ -32,7 +35,8 @@ export const postResolvers = {
                 .findAll({
                     limit,
                     offset
-                });
+                })
+                .catch(handleError);
         },
 
         post: (post, { id }, { db }: { db: DbConnection }, info: GraphQLResolveInfo) => {
@@ -43,7 +47,8 @@ export const postResolvers = {
                 .then((post: PostInstance | null) => {
                     if (!post) throw new error(`Post with id ${id} not found`);
                     return post;
-                });
+                })
+                .catch(handleError);
         }
     },
 
@@ -52,21 +57,27 @@ export const postResolvers = {
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Post
                     .create(input, { transaction: t });
-            });
+            })
+                .catch(handleError);
         },
 
         updatePost: (post, { id, input }, { db }: { db: DbConnection }, info: GraphQLResolveInfo) => {
+            id = parseInt(id);
+
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Post
                     .findById(id)
                     .then((post: PostInstance | null) => {
                         if (!post) throw new error(`Post with id ${id} not found`);
-                        return post.update(id, input, { transaction: t });
+                        return post.update(input, { transaction: t });
                     });
-            });
+            })
+                .catch(handleError);
         },
 
         deletePost: (post, { id }, { db }: { db: DbConnection }, info: GraphQLResolveInfo) => {
+            id = parseInt(id);
+
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Post
                     .findById(id)
@@ -75,7 +86,8 @@ export const postResolvers = {
                         post.destroy({ transaction: t });
                         return true;
                     });
-            });
+            })
+                .catch(handleError);
         }
     }
 };

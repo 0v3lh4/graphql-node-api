@@ -36,3 +36,9 @@ export const onListening = (server: Server) => {
         console.log(`Listening at ${bind(addr)} ...`);
     }
 }
+
+export const handleError = (error: Error) => {
+    const errorMessage: string = `${error.name}:${error.message}`;
+    console.log(errorMessage);
+    return Promise.reject(new Error(errorMessage));
+}
