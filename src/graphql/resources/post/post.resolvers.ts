@@ -10,7 +10,7 @@ export const postResolvers = {
     Post: {
         author: (post, args, { db }: { db: DbConnection }, info: GraphQLResolveInfo) => {
             return db.User
-                .findById(post.get('author'))
+                .findByPk(post.get('author'))
                 .then((user: UserInstance | null) => {
                     if (!user) throw new error(`Author with id ${post.get('author')} not found`);
                     return user;
@@ -43,7 +43,7 @@ export const postResolvers = {
             id = parseInt(id);
 
             return db.Post
-                .findById(id)
+                .findByPk(id)
                 .then((post: PostInstance | null) => {
                     if (!post) throw new error(`Post with id ${id} not found`);
                     return post;
@@ -66,7 +66,7 @@ export const postResolvers = {
 
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Post
-                    .findById(id)
+                    .findByPk(id)
                     .then((post: PostInstance | null) => {
                         if (!post) throw new error(`Post with id ${id} not found`);
                         return post.update(input, { transaction: t });
@@ -80,11 +80,12 @@ export const postResolvers = {
 
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Post
-                    .findById(id)
+                    .findByPk(id)
                     .then((post: PostInstance | null) => {
                         if (!post) throw new error(`Post with id ${id} not found`);
-                        post.destroy({ transaction: t });
-                        return true;
+                        return post.destroy({ transaction: t })
+                            .then(() => true)
+                            .catch(() => false);
                     });
             })
                 .catch(handleError);

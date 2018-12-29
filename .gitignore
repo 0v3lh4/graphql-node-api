@@ -1,3 +1,5 @@
 dist
 node_modules
 docker/data
+.DS_Store
+

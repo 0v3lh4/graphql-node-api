@@ -31,7 +31,7 @@ export const userResolvers = {
             id = parseInt(id);
 
             return db.User
-                .findById(id)
+                .findByPk(id)
                 .then((user: UserInstance | null) => {
                     if (!user) throw new error(`User with id ${id} not found!`);
                     return user;
@@ -68,7 +68,7 @@ export const userResolvers = {
 
             return db.sequelize.transaction((t: Transaction) => {
                 return db.User
-                    .findById(id)
+                    .findByPk(id)
                     .then((user: UserInstance | null) => {
                         if (!user) throw new error(`User with id ${id} not found!`);
 
@@ -84,11 +84,13 @@ export const userResolvers = {
 
             return db.sequelize.transaction((t: Transaction) => {
                 return db.User
-                    .findById(id)
+                    .findByPk(id)
                     .then((user: UserInstance | null) => {
                         if (!user) throw new error(`User with id ${id} not found!`);
-                        user.destroy({ transaction: t });
-                        return true;
+                        return user
+                            .destroy({ transaction: t })
+                            .then(() => true)
+                            .catch(() => false);
                     });
             })
                 .catch(handleError);

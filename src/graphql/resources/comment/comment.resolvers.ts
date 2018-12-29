@@ -10,13 +10,13 @@ export const commentResolvers = {
     Comment: {
         post: (comment, args, { db }: { db: DbConnection }, info: GraphQLResolveInfo) => {
             return db.Post
-                .findById(comment.get('post'))
+                .findByPk(comment.get('post'))
                 .catch(handleError);
         },
 
         user: (comment, args, { db }: { db: DbConnection }, info: GraphQLResolveInfo) => {
             return db.User
-                .findById(comment.get('user'))
+                .findByPk(comment.get('user'))
                 .catch(handleError);
         }
     },
@@ -48,7 +48,7 @@ export const commentResolvers = {
 
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Comment
-                    .findById(id)
+                    .findByPk(id)
                     .then((comment: CommentInstance | null) => {
                         if (!comment) throw new error(`Comment with id ${id} not found`);
                         return comment.update(input, { transaction: t });
@@ -61,11 +61,12 @@ export const commentResolvers = {
 
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Comment
-                    .findById(id)
+                    .findByPk(id)
                     .then((comment: CommentInstance | null) => {
                         if (!comment) throw new error(`Comment with id ${id} not found`);
-                        comment.destroy({ transaction: t });
-                        return true;
+                        return comment.destroy({ transaction: t })
+                            .then(() => true)
+                            .catch(() => false);
                     });
             }).catch(handleError);
         },
