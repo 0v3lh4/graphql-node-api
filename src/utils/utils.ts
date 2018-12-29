@@ -39,6 +39,6 @@ export const onListening = (server: Server) => {
 
 export const handleError = (error: Error) => {
     const errorMessage: string = `${error.name}:${error.message}`;
-    console.log(errorMessage);
+    console.error(errorMessage);
     return Promise.reject(new Error(errorMessage));
 }

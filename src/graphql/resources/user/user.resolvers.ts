@@ -1,7 +1,6 @@
 import { GraphQLResolveInfo } from "graphql";
 import { DbConnection } from "../../../interfaces/DbConnection";
 import { UserInstance } from "../../../models/UserModel";
-import { error } from "util";
 import { Transaction } from "sequelize";
 import { handleError } from "../../../utils/utils";
 
@@ -33,7 +32,7 @@ export const userResolvers = {
             return db.User
                 .findByPk(id)
                 .then((user: UserInstance | null) => {
-                    if (!user) throw new error(`User with id ${id} not found!`);
+                    if (!user) throw new Error(`User with id ${id} not found!`);
                     return user;
                 })
                 .catch(handleError);
@@ -56,7 +55,7 @@ export const userResolvers = {
                 return db.User
                     .findByPk(id)
                     .then((user: UserInstance | null) => {
-                        if (!user) throw new error(`User with id ${id} not found!`);
+                        if (!user) throw new Error(`User with id ${id} not found!`);
                         return user.update(input, { transaction: t });
                     });
             })
@@ -70,7 +69,7 @@ export const userResolvers = {
                 return db.User
                     .findByPk(id)
                     .then((user: UserInstance | null) => {
-                        if (!user) throw new error(`User with id ${id} not found!`);
+                        if (!user) throw new Error(`User with id ${id} not found!`);
 
                         return user.update(input, { transaction: t })
                             .then((user: UserInstance) => !!user);
@@ -86,7 +85,7 @@ export const userResolvers = {
                 return db.User
                     .findByPk(id)
                     .then((user: UserInstance | null) => {
-                        if (!user) throw new error(`User with id ${id} not found!`);
+                        if (!user) throw new Error(`User with id ${id} not found!`);
                         return user
                             .destroy({ transaction: t })
                             .then(() => true)

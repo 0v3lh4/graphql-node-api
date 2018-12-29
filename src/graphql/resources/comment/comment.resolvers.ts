@@ -3,7 +3,6 @@ import { GraphQLResolveInfo } from "graphql";
 import PostModel from "../../../models/PostModel";
 import { Transaction } from "sequelize";
 import { CommentInstance } from "../../../models/CommentModel";
-import { error } from "util";
 import { handleError } from "../../../utils/utils";
 
 export const commentResolvers = {
@@ -50,7 +49,7 @@ export const commentResolvers = {
                 return db.Comment
                     .findByPk(id)
                     .then((comment: CommentInstance | null) => {
-                        if (!comment) throw new error(`Comment with id ${id} not found`);
+                        if (!comment) throw new Error(`Comment with id ${id} not found`);
                         return comment.update(input, { transaction: t });
                     });
             }).catch(handleError);
@@ -63,7 +62,7 @@ export const commentResolvers = {
                 return db.Comment
                     .findByPk(id)
                     .then((comment: CommentInstance | null) => {
-                        if (!comment) throw new error(`Comment with id ${id} not found`);
+                        if (!comment) throw new Error(`Comment with id ${id} not found`);
                         return comment.destroy({ transaction: t })
                             .then(() => true)
                             .catch(() => false);

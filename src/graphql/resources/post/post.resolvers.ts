@@ -1,7 +1,6 @@
 import { GraphQLResolveInfo } from "graphql";
 import { DbConnection } from "../../../interfaces/DbConnection";
 import { UserInstance } from "../../../models/UserModel";
-import { error } from "util";
 import { PostInstance } from "../../../models/PostModel";
 import { Transaction } from "sequelize";
 import { handleError } from "../../../utils/utils";
@@ -12,7 +11,7 @@ export const postResolvers = {
             return db.User
                 .findByPk(post.get('author'))
                 .then((user: UserInstance | null) => {
-                    if (!user) throw new error(`Author with id ${post.get('author')} not found`);
+                    if (!user) throw new Error(`Author with id ${post.get('author')} not found`);
                     return user;
                 })
                 .catch(handleError);
@@ -45,7 +44,7 @@ export const postResolvers = {
             return db.Post
                 .findByPk(id)
                 .then((post: PostInstance | null) => {
-                    if (!post) throw new error(`Post with id ${id} not found`);
+                    if (!post) throw new Error(`Post with id ${id} not found`);
                     return post;
                 })
                 .catch(handleError);
@@ -68,7 +67,7 @@ export const postResolvers = {
                 return db.Post
                     .findByPk(id)
                     .then((post: PostInstance | null) => {
-                        if (!post) throw new error(`Post with id ${id} not found`);
+                        if (!post) throw new Error(`Post with id ${id} not found`);
                         return post.update(input, { transaction: t });
                     });
             })
@@ -82,7 +81,7 @@ export const postResolvers = {
                 return db.Post
                     .findByPk(id)
                     .then((post: PostInstance | null) => {
-                        if (!post) throw new error(`Post with id ${id} not found`);
+                        if (!post) throw new Error(`Post with id ${id} not found`);
                         return post.destroy({ transaction: t })
                             .then(() => true)
                             .catch(() => false);
