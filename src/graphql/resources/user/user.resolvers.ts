@@ -3,40 +3,74 @@ import { DbConnection } from "../../../interfaces/DbConnection";
 import { UserInstance } from "../../../models/UserModel";
 import { Transaction } from "sequelize";
 import { handleError } from "../../../utils/utils";
+import { compose } from "../../composable/composable.resolver";
+import { AuthUser } from "../../../interfaces/AuthUser";
+import { ResolverContext } from "../../../interfaces/ResolverContext";
+import { authResolvers } from "../../composable/auth.resolver";
+import { RequestedFields } from "../../ast/RequestedFields";
 
 export const userResolvers = {
     User: {
-        posts: (parent, { limit = 10, offset = 0 }, { db }: { db: DbConnection }, info: GraphQLResolveInfo) => {
+        posts: (parent, { limit = 10, offset = 0 }, ctx: ResolverContext, info: GraphQLResolveInfo) => {
+            const db = ctx.db as DbConnection;
+            const requestedFields = ctx.requestedFields as RequestedFields;
+
             return db.Post
                 .findAll({
                     where: { author: parent.get('id') },
                     limit,
-                    offset
+                    offset,
+                    attributes: requestedFields.getFields(info, { keep: ['id'], exclude: ['comments'] })
                 })
                 .catch(handleError);
         },
     },
 
     Query: {
-        users: (parent, { limit = 10, offset = 0 }, { db }: { db: DbConnection }, info: GraphQLResolveInfo) => {
+        users: (parent, { limit = 10, offset = 0 }, ctx: ResolverContext, info: GraphQLResolveInfo) => {
+            const db = ctx.db as DbConnection;
+            const requestedFields = ctx.requestedFields as RequestedFields;
+
             return db.User.findAll({
                 limit,
-                offset
+                offset,
+                attributes: requestedFields.getFields(info, { keep: ['id'], exclude: ['posts'] })
             })
                 .catch(handleError);
         },
 
-        user: (parent, { id }, { db }: { db: DbConnection }, info: GraphQLResolveInfo) => {
+        user: (parent, { id }, ctx: ResolverContext, info: GraphQLResolveInfo) => {
             id = parseInt(id);
 
+            const db = ctx.db as DbConnection;
+            const requestedFields = ctx.requestedFields as RequestedFields;
+
             return db.User
-                .findByPk(id)
+                .findByPk(id, {
+                    attributes: requestedFields.getFields(info, { keep: ['id'], exclude: ['posts'] })
+                })
                 .then((user: UserInstance | null) => {
                     if (!user) throw new Error(`User with id ${id} not found!`);
                     return user;
                 })
                 .catch(handleError);
-        }
+        },
+
+        currentUser: compose(...authResolvers)((parent, args, ctx: ResolverContext, info) => {
+            const db = ctx.db as DbConnection;
+            const authUser = ctx.authUser as AuthUser;
+            const requestedFields = ctx.requestedFields as RequestedFields;
+
+            return db.User
+                .findByPk(authUser.id, {
+                    attributes: requestedFields.getFields(info, { keep: ['id'], exclude: ['posts'] })
+                })
+                .then((user: UserInstance | null) => {
+                    if (!user) throw new Error(`User with id ${authUser.id} not found!`);
+                    return user;
+                })
+                .catch(handleError);
+        })
     },
 
     Mutation: {
@@ -48,44 +82,47 @@ export const userResolvers = {
                 .catch(handleError);
         },
 
-        updateUser: (parent, { id, input }, { db }: { db: DbConnection }, info: GraphQLResolveInfo) => {
-            id = parseInt(id);
+        updateUser: compose(...authResolvers)((parent, { input }, ctx: ResolverContext, info: GraphQLResolveInfo) => {
+            const db = ctx.db as DbConnection;
+            const authUser = ctx.authUser as AuthUser;
 
             return db.sequelize.transaction((t: Transaction) => {
                 return db.User
-                    .findByPk(id)
+                    .findByPk(authUser.id)
                     .then((user: UserInstance | null) => {
-                        if (!user) throw new Error(`User with id ${id} not found!`);
+                        if (!user) throw new Error(`User with id ${authUser.id} not found!`);
                         return user.update(input, { transaction: t });
                     });
             })
                 .catch(handleError);
-        },
+        }),
 
-        updateUserPassword: (parent, { id, input }, { db }: { db: DbConnection }, info: GraphQLResolveInfo) => {
-            id = parseInt(id);
+        updateUserPassword: compose(...authResolvers)((parent, { input }, ctx: ResolverContext, info: GraphQLResolveInfo) => {
+            const db = ctx.db as DbConnection;
+            const authUser = ctx.authUser as AuthUser;
 
             return db.sequelize.transaction((t: Transaction) => {
                 return db.User
-                    .findByPk(id)
+                    .findByPk(authUser.id)
                     .then((user: UserInstance | null) => {
-                        if (!user) throw new Error(`User with id ${id} not found!`);
+                        if (!user) throw new Error(`User with id ${authUser.id} not found!`);
 
                         return user.update(input, { transaction: t })
                             .then((user: UserInstance) => !!user);
                     });
             })
                 .catch(handleError);
-        },
+        }),
 
-        deleteUser: (parent, { id, input }, { db }: { db: DbConnection }, info: GraphQLResolveInfo) => {
-            id = parseInt(id);
+        deleteUser: compose(...authResolvers)((parent, { input }, ctx:ResolverContext, info: GraphQLResolveInfo) => {
+            const db = ctx.db as DbConnection;
+            const authUser = ctx.authUser as AuthUser;
 
             return db.sequelize.transaction((t: Transaction) => {
                 return db.User
-                    .findByPk(id)
+                    .findByPk(authUser.id)
                     .then((user: UserInstance | null) => {
-                        if (!user) throw new Error(`User with id ${id} not found!`);
+                        if (!user) throw new Error(`User with id ${authUser.id} not found!`);
                         return user
                             .destroy({ transaction: t })
                             .then(() => true)
@@ -93,6 +130,6 @@ export const userResolvers = {
                     });
             })
                 .catch(handleError);
-        }
+        })
     }
 };

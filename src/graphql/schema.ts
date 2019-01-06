@@ -8,6 +8,8 @@ import { merge } from 'lodash';
 import { commentResolvers } from './resources/comment/comment.resolvers';
 import { userResolvers } from './resources/user/user.resolvers';
 import { postResolvers } from './resources/post/post.resolvers';
+import { tokenTypes } from './resources/token/token.schema';
+import { tokenResolvers } from './resources/token/token.resolvers';
 
 const SchemaDefinition:string = `
     type Schema {
@@ -18,6 +20,7 @@ const SchemaDefinition:string = `
 
 const resolvers: any = merge(
     userResolvers,
+    tokenResolvers,
     postResolvers,
     commentResolvers
 );
@@ -27,6 +30,7 @@ export default makeExecutableSchema({
         SchemaDefinition,
         Query,
         Mutation,
+        tokenTypes,
         userTypes,
         postTypes,
         commentTypes

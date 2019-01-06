@@ -12,7 +12,10 @@ let config: DataBaseConfig = require(path.join(__dirname, '..', 'config', 'confi
 
 let db: any = {};
 
-const operatorsAliases = false;
+const operatorsAliases = {
+    $in: Sequelize.Op.in,
+};
+
 config = Object.assign({operatorsAliases}, config);
 
 const sequelize: Sequelize.Sequelize = new Sequelize(

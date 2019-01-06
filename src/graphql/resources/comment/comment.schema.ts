@@ -11,7 +11,6 @@ const commentTypes: string = `
     input CommentCreateInput {
         comment: String!
         post: Int!
-        user: Int!
     }
 `;
 

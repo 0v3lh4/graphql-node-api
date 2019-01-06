@@ -1,5 +1,6 @@
 import { Server } from "http";
 import { AddressInfo } from "net";
+import jwt from "jsonwebtoken";
 
 const bind = (addr: AddressInfo | string): string =>
     (typeof addr === 'string') ? `pipe: ${addr}` : `port: ${addr.port}`;
@@ -42,3 +43,11 @@ export const handleError = (error: Error) => {
     console.error(errorMessage);
     return Promise.reject(new Error(errorMessage));
 }
+
+export const throwError = (condition: Boolean, message: string) => {
+    if(condition) {
+        throw new Error(message);
+    }
+}
+
+export const JWT_SECRET: jwt.Secret = process.env.JWT_SECRET as string;
