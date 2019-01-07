@@ -1,6 +1,7 @@
 import { Server } from "http";
 import { AddressInfo } from "net";
 import jwt from "jsonwebtoken";
+import { ENV } from "../constants/ENV";
 
 const bind = (addr: AddressInfo | string): string =>
     (typeof addr === 'string') ? `pipe: ${addr}` : `port: ${addr.port}`;
@@ -40,7 +41,7 @@ export const onListening = (server: Server) => {
 
 export const handleError = (error: Error) => {
     const errorMessage: string = `${error.name}:${error.message}`;
-    console.error(errorMessage);
+    if(process.env.NODE_ENV !== ENV.NODE.TESTING) { console.error(errorMessage); }
     return Promise.reject(new Error(errorMessage));
 }
 
