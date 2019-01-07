@@ -62,5 +62,5 @@ typings/
 
 # project ignore
 dist
-docker/data
+docker/data*
 .DS_Store
